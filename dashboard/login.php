@@ -39,14 +39,32 @@ if (isset($_POST['uname']) && isset($_POST['password'])) {
 				$_SESSION['user_name'] = $row['user_name'];
 				$_SESSION['name'] = $row['name'];
 				$_SESSION['id'] = $row['id'];
+				$_SESSION['type'] = 'admin';
 				header("Location: dashboard.php");
 				exit();
 			}
-			else{
-				header("Location: index.php?error=Incorect User name or password");
-				exit();
+		}
+
+			$hashed_pass = md5($pass);
+			$query ="SELECT * FROM clientusers WHERE email='$uname' AND type='staff'";
+			$staff_result = mysqli_query($conn, $query) or die(mysqli_error($res));
+			if (mysqli_num_rows($staff_result) === 1) {
+				$row = mysqli_fetch_assoc($staff_result);
+				if ($row['email'] === $uname && $row['password'] === $hashed_pass) {
+					$_SESSION['user_name'] = $row['email'];
+					$_SESSION['name'] = $row['name'];
+					$_SESSION['id'] = $row['id'];
+					$_SESSION['type'] = $row['staff'];
+					header("Location: dashboard.php");
+					exit();
 				}
+
+
 			}
+
+			header("Location: index.php?error=Incorect User name or password");
+			exit();
+			
 		// if(isset($_POST['g-recaptcha-response'])){
 
 			

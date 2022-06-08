@@ -10,7 +10,7 @@ $data = json_decode(file_get_contents("php://input"));
 
 if($_SERVER["REQUEST_METHOD"] === "POST"){
     $user_id = $_SESSION['id'] ;
-    $query = "INSERT INTO bookings (staff,date,timeslot, status, userid) VALUES('$data->staff', '$data->date', '$data->time', 'pending', $user_id)";
+    $query = "INSERT INTO bookings (staff_id,date,timeslot, status, userid) VALUES('$data->staff', '$data->date', '$data->time', 'pending', $user_id)";
     mysqli_query($conn, $query);
     $booking_id = mysqli_insert_id($conn);
 

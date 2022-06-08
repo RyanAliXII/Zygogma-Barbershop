@@ -48,7 +48,7 @@ if (isset($_POST['uname']) && isset($_POST['password'])
 		// hashing the password
         $pass = md5($pass);
 
-	    $sql = "SELECT * FROM clientusers WHERE user_name='$uname' ";
+	    $sql = "SELECT * FROM clientusers WHERE email='$uname' ";
 		
 		$result = mysqli_query($conn, $sql);
 
@@ -56,7 +56,7 @@ if (isset($_POST['uname']) && isset($_POST['password'])
 			header("Location: signup.php?error=The username is taken try another&$user_data");
 	        exit();
 		}else {
-           $sql2 = "INSERT INTO clientusers(user_name, password, name, last_login) VALUES('$uname', '$pass', '$name','null')";
+           $sql2 = "INSERT INTO clientusers(email, password, name, last_login) VALUES('$uname', '$pass', '$name','null')";
 		 
            $result2 = mysqli_query($conn, $sql2) or die(mysqli_error($conn));
 			

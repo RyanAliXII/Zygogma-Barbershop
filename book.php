@@ -1,36 +1,6 @@
 <?php
 session_start(); 
-// $bookings = array();
 $mysqli = new mysqli('localhost', 'root', 'password', 'db');
-// if(isset($_GET['date'])){
-//     $date = $_GET['date'];
-// }
-
-// if(isset($_POST['submit'])){;
-//     $hairtreatment = $_POST['hairtreatment'];
-//     $staff = $_POST['staff'];
-//     $time = $_POST['time'];
-
-//     $stmt = $mysqli->prepare("select * from bookings where date=? AND timeslot=?");
-//     $stmt->bind_param('ss', $date,$time);
-//     if($stmt->execute()){
-//         $result = $stmt->get_result();
-//         if($result->num_rows>0){
-//             $msg = "<div class='alert alert-danger'>Already Booked</div>";
-//         }else{
-//             $userid = $_SESSION['id'];
-//             $stmt = $mysqli->prepare("INSERT INTO bookings (haircut, hairtreatment, staff, total, date, timeslot,userid) VALUES (?,?,?,?,?,?,?)");
-//             $stmt->bind_param('sssssss',$haircut,$hairtreatment ,$staff ,$total , $date , $time, $userid);
-//             $stmt->execute();
-//             $msg = "<div class='alert alert-success'>Booking Successfull</div>";
-//             $bookings[] = $time;
-//             $stmt->close();
-//             $mysqli->close();
-//         }
-//     }
-
-// }
-
 
 $duration = 10;
 $cleanup = 0;
@@ -115,11 +85,19 @@ function timeslots($duration, $cleanup, $start, $end){
                                 <div class="form-group">
                                     <label for="">Staff</label>
                                     <select name="staff" id="staff" class="form-control" required>
-                                        <option></option>
-                                        <option value="Robert Albaon">Robert Albaon</option>
-                                        <option value="Saneil Celso">Saneil Celso</option>
-                                        <option value="Carlo Balean">Carlo Balean</option>
-                                        <option value="ark Anthony Betito">Mark Anthony Betito</option>
+                                    <?php
+                                     $fetch_query = "Select * from clientusers where type ='staff'";
+                                     $records = $mysqli->query($fetch_query ) or die(mysqli_error($connect));
+                                      while($row = $records->fetch_assoc()){ 
+                                         ?>
+                                            <option value=<?php  echo $row['id']; ?>> 
+                                            <?php  echo  $row['name']; ?>
+                                            </option>
+                                       
+                                       <?php
+                            
+                                                }
+                                         ?>
                                     </select>
                                 </div>
                                 <div class="form-group">

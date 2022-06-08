@@ -102,14 +102,6 @@ section{
 .header .nav a:hover{
    color:var(--blue);
 }
-
-
-
-
-
-
-
-
 #menu-btn{
    font-size: 2.5rem;
    color:var(--black);

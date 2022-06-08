@@ -29,6 +29,7 @@
                                 <th>Time Slot</th>
                                <th>Status</th>
                                <th>Services Availed</th>
+                               <th>Actions</th>
                               </tr>
                              </thead>
                              <tbody id="appointmentTableBody">
@@ -72,6 +73,13 @@
                             <td>
                                <button class="btn btn-primary view-services"  data-toggle="modal" onclick="fetchServices(this)" data-target="#servicesListModal">View services</button>
                             </td>
+                            <td>
+                                <div class="actions">
+                                         <button class="btn btn-success done" action="done" onclick="markAppointment(this)"><i class="fa fa-check"></i></button>
+                                         <button class="btn btn-danger cancel" action="cancel" onclick="markAppointment(this)"><i class="fa fa-times"></i></button>
+                                </div>
+                               <!-- <button class="btn btn-primary view-services"  data-toggle="modal" onclick="fetchServices(this)" data-target="#servicesListModal">View services</button> -->
+                            </td>
                         </tr> 
                      </template>
                      <template id="serviceRowTemplate">
@@ -95,6 +103,7 @@
                      const populateTable = (data)=>{
                         const rowTemplate = document.querySelector("#appointmentRowTemplate").content
                         const table = document.querySelector("#appointmentTableBody")
+                        table.innerHTML = ""
                         data.forEach((d)=>{
                             const tableRow = rowTemplate.cloneNode(true)
                             for (const[key, value] of Object.entries(d)){
@@ -105,6 +114,13 @@
                                
                             }
                             tableRow.querySelector('.view-services').setAttribute('apnt-id', d.id)
+                            tableRow.querySelector('.actions').setAttribute('apnt-id', d.id)
+                            if(d.status === "done"){
+                                        tableRow.querySelector('.actions').querySelector('.done').remove()
+                            }
+                            if(d.status === "cancel"){
+                                        tableRow.querySelector('.actions').querySelector('.cancel').remove()
+                            }
                             table.append(tableRow)
                         })
                         
@@ -141,6 +157,29 @@
                         tableRow.querySelector(".service-price").innerHTML = `<strong>${accumulator} ₱<strong>`
                         servicesTbody.append(tableRow)
                         
+                     }
+
+                     const markAppointment = (e)=>{
+                        const id = e.parentElement.getAttribute('apnt-id')
+                        const action = e.getAttribute('action')
+                        const text = action == 'done' ?  "Are you sure you want to accept this appointment?" : "Are you sure you want to cancel this appointment?"
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: text,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes'
+                            }).then(async(result) => {
+                            if (result.isConfirmed) {
+                                const request = await fetch(`datatables/fetch.php?action=${action}&id=${id}`,{
+                                    method:"PUT"
+                                })
+
+                                fetchAppointments();
+                            }
+                            })
                      }
                      fetchAppointments()
                  </script>
@@ -183,5 +222,6 @@
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-        <?php include('include/scripts.php');?>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>       
+<?php include('include/scripts.php');?>
 <?php include('include/endfooter.php');?>

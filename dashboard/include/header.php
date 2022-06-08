@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <?php
 include "db_conn.php";
+session_start();
  $connect = $conn;
  $query = "SELECT status, count(*) as number FROM bookings GROUP BY status";
  $result = mysqli_query($connect, $query);

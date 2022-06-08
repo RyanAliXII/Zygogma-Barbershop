@@ -16,6 +16,12 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
                                 Reviews and Feedback
                             </a>
+                            <?php
+                           
+                                $user_type = $_SESSION['type'];
+                                if($user_type == 'admin'){
+                            
+                            ?>
                             <a class="nav-link" href="service.php" >
                                 <div class="sb-nav-link-icon"><i class="fas fa-cut"></i></i></div>
                                 Services
@@ -24,6 +30,9 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
                                 Staff
                             </a>
+                            <?php
+                                }
+                            ?>
                         </div>
                     </div>
                     <div class="sb-sidenav-footer">
