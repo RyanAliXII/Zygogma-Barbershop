@@ -5,6 +5,13 @@ session_start();
  $connect = $conn;
  $query = "SELECT status, count(*) as number FROM bookings GROUP BY status";
  $result = mysqli_query($connect, $query);
+
+
+
+
+
+
+
  ?>
 <html lang="en">
     <head>
@@ -100,6 +107,24 @@ session_start();
             <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
             </form>
             <!-- Navbar-->
+            <span style="color:white"><?php echo $_SESSION['name']?> </span>
+            <?php
+              if($_SESSION['type'] != 'admin'){
+              if($_SESSION['isAvailable'] == 1){
+
+              
+            ?>
+            <span class="statusText" style="color:white">&nbsp|&nbspAvailable</span>
+            <?php
+              }
+              else{
+
+            ?>
+              <span class="statusText" style="color:white">&nbsp| &nbspBusy</span>
+              <?php
+              }
+            }
+              ?>
             <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
@@ -107,7 +132,53 @@ session_start();
                         <li><a class="dropdown-item" href="activity_log.php">Activity Log</a></li>
                         <li><hr class="dropdown-divider" /></li>
                         <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                        <?php
+
+              if($_SESSION['type'] != 'admin'){
+              if($_SESSION['isAvailable'] == 1){
+
+              
+            ?>
+           <li><a class="dropdown-item" style="cursor:pointer" onclick="toggleStatus(this)" isavailable="<?php echo $_SESSION['isAvailable'];?>">Set as busy</a></li>
+            <?php
+              }
+              else{
+
+            ?>
+              <li><a class="dropdown-item" style="cursor:pointer" onclick="toggleStatus(this)" isavailable="<?php echo $_SESSION['isAvailable'];?>">Set as available</a></li>
+              <?php
+              }
+            }
+              ?>
+                       
                     </ul>
                 </li>
             </ul>
         </nav>
+
+
+
+        <script>
+
+            const toggleStatus = (e)=>{
+              const currentStatus = e.getAttribute('isavailable')
+              if(parseInt(currentStatus) === 1){
+                e.setAttribute('isavailable','0')
+                e.innerText = "Set as available"
+                document.querySelector('.statusText').innerHTML = "&nbsp| &nbspBusy"
+              }
+              else{
+                e.setAttribute('isavailable','1')
+                e.innerText = "Set as busy"
+                document.querySelector('.statusText').innerHTML = "&nbsp| &nbspAvailable"
+              }
+              setAccountStatus(currentStatus)
+            }
+            const setAccountStatus = async (currentStatus)=>{
+              const request = await fetch(`user_route.php?currentStatus=${currentStatus}`,{method:"PUT"})
+              const response = await request.text()
+              console.log(response)
+            }
+            
+
+        </script>

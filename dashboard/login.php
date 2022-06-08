@@ -40,6 +40,7 @@ if (isset($_POST['uname']) && isset($_POST['password'])) {
 				$_SESSION['name'] = $row['name'];
 				$_SESSION['id'] = $row['id'];
 				$_SESSION['type'] = 'admin';
+				$_SESSION['isAvailable'] = $row['isAvailable'];
 				header("Location: dashboard.php");
 				exit();
 			}
@@ -54,7 +55,8 @@ if (isset($_POST['uname']) && isset($_POST['password'])) {
 					$_SESSION['user_name'] = $row['email'];
 					$_SESSION['name'] = $row['name'];
 					$_SESSION['id'] = $row['id'];
-					$_SESSION['type'] = $row['staff'];
+					$_SESSION['type'] = 'staff';
+					$_SESSION['isAvailable'] = $row['isAvailable'];
 					header("Location: dashboard.php");
 					exit();
 				}

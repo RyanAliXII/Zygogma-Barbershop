@@ -89,9 +89,13 @@ function timeslots($duration, $cleanup, $start, $end){
                                      $fetch_query = "Select * from clientusers where type ='staff'";
                                      $records = $mysqli->query($fetch_query ) or die(mysqli_error($connect));
                                       while($row = $records->fetch_assoc()){ 
+                                          $availability  = ($row['isAvailable'] == 1) ? "Available" : "Busy" ;
+                                          $isdisabled  = ($row['isAvailable'] == 1) ? "" : "disabled" ;
                                          ?>
-                                            <option value=<?php  echo $row['id']; ?>> 
-                                            <?php  echo  $row['name']; ?>
+                                            <option value=<?php  echo $row['id']; ?>   <?php  echo $isdisabled?>> 
+                                            <?php 
+                                            $name = $row['name'];
+                                            echo  " $name - $availability";?>
                                             </option>
                                        
                                        <?php
