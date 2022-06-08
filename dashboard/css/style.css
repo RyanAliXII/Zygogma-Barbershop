@@ -1,0 +1,47 @@
+
+
+.w-450 {
+	width: 450px;
+}
+.vh-100 {
+	min-height: 100vh;
+	text-align: center;
+}
+.display-4 {
+	font-family: "Brush Script M7",cursive;
+	font-weight: bold;
+}
+.form-label {
+	font-weight: bold;
+}
+
+.btn-primary {
+	font-weight: bold;
+	width: 150px;
+}
+
+#capt {
+	width: 170px;
+	height: 30px;
+	font-size: 20px;
+	background-color: #C1BABA;
+	padding: 5px;
+	border: none;
+	letter-spacing: 1px;
+	float: left;
+	color: #191919;
+	border-radius: 5px 00 5px;
+}
+
+.refresh {
+	float: left;
+	height: 20px;
+	border-radius: 0 5px 5px 0;
+}
+
+.refresh img{
+	height: 20px;
+	margin-top: 4px;
+	margin-left: 3px;
+	cursor: pointer;
+}
