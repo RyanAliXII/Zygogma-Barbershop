@@ -24,12 +24,13 @@
                               <tr>
                                 <th>Service name</th>
                                 <th>Price</th>
-                               
+                                <th>Estimated time of completion</th>
                               </tr>
                              </thead>
                              <tbody id="appointmentTableBody">
                              <?php
                              $fetch_query = "Select * from services";
+                             $MINUTES_IN_HOURS = 60;
                              $records = mysqli_query($connect, $fetch_query ) or die(mysqli_error($connect));
                                while($row = mysqli_fetch_assoc($records)){ 
                              ?>
@@ -41,6 +42,35 @@
                                         <td>
                                             <?php echo $row['price'];?>
                                         </td>
+                                        <td class="est-completion">
+                                        <?php 
+                                        
+                                        
+                                        $unit = $row['unit'];
+                                        $estc = $row['est_completion'];
+                                        if($unit == 'hour' ){
+                                          $estc = $estc / $MINUTES_IN_HOURS;
+                                          if($estc <= 1){
+                                            echo "$estc $unit";
+                                          }
+                                          else{
+                                            echo "$estc hours";
+                                          }
+                                         
+                                        }
+                                        else{
+                                          if($estc <= 1){
+                                            echo "$estc $unit";
+                                          }
+                                          else{
+                                            echo "$estc minutes";
+                                          }
+                                        }
+                                        
+                                        
+                                        
+                                        ?>
+                                         </td>
                                     </tr>
                                 <?php
                                }
@@ -74,6 +104,16 @@
     <label for="price">Service price</label>
     <input type="number" class="form-control" name="price" placeholder="Price">
   </div>
+  <label class="d-block">Estimated time of completion</label>
+  <div class="form-group">
+         
+          <input type="number" name="service_completion" class="form-control" value="1">
+          <select  name="unit" class="form-control mt-1">
+            <option value="minute">Minutes</option>
+            <option  value="hour">Hours</option>
+          </select>                    
+
+  </div>
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
       </div>
@@ -97,6 +137,9 @@
 
                             </td>
                             <td class="service-price">
+
+                            </td>
+                            <td class="est-completion">
 
                             </td>
                             

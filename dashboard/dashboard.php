@@ -77,7 +77,10 @@ $connect = $conn;
             chart.draw(data, options);
           }
         </script>
-
+<!-- SELECT staff_id,name,isAvailable, SUM(est_completion) as total_consumed FROM service_booking 
+JOIN bookings on service_booking.booking_id = bookings.id 
+JOIN clientusers on bookings.staff_id = clientusers.id
+JOIN services on service_booking.services_id = services.service_id where date = '2022-06-16' GROUP BY staff_id -->
 
 
     </head>

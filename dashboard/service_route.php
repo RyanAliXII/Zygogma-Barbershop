@@ -6,7 +6,15 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
     
     $name = $_POST['name'];
     $price = $_POST['price'];
-    $query = "INSERT INTO services(service_name, price) VALUES('$name', $price)";
+    $service_completion = $_POST['service_completion'];
+    $unit = $_POST['unit'];
+
+    $MINUTES_PER_HOUR = 60;
+    if($unit == 'hour'){
+        $service_completion = $service_completion *  $MINUTES_PER_HOUR;
+    }
+
+    $query = "INSERT INTO services(service_name, price, est_completion, unit) VALUES('$name', $price, $service_completion, '$unit')";
     mysqli_query($conn, $query) or die(mysqli_error($conn));
     // if (mysqli_query($connect, $sql)) {
     //     echo "New record created successfully";
@@ -31,7 +39,8 @@ if($_SERVER['REQUEST_METHOD'] == "GET"){
        
             $service= array(
                 "name"=>$service_name,
-                "price"=> $price
+                "price"=> $price,
+                "est_completion"=> $est_completion
     
             );
                 array_push($list_of_services["records"], $service);

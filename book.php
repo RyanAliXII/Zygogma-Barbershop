@@ -50,8 +50,10 @@ function timeslots($duration, $cleanup, $start, $end){
                             <form action="" id="appointmentForm" method="post">
                                 <div class="form-group">
                                 <div class="form-group">
+
+                                    <input type="text" readonly name="time" class="form-control time-input">
                                     <label for="time">Time</label>
-                                    <select name="time" class="form-control"> 
+                                    <!-- <select name="time" class="form-control"> 
                                     <?php $timeslots = timeslots($duration, $cleanup, $start, $end);
                                       foreach($timeslots as $ts){
                                     ?>
@@ -59,7 +61,7 @@ function timeslots($duration, $cleanup, $start, $end){
                                         <?php
                                       }    
                                     ?>
-                                    </select>
+                                    </select> -->
                                 </div>
                                 </div>
                                 <div class="form-group">
@@ -71,7 +73,7 @@ function timeslots($duration, $cleanup, $start, $end){
                                      $records = $mysqli->query($fetch_query ) or die(mysqli_error($connect));
                                       while($row = $records->fetch_assoc()){ 
                                 ?>
-                                            <option value=<?php  echo $row['service_id']; ?> service-price=<?php  echo $row['price'];?>> <?php  
+                                            <option value=<?php  echo $row['service_id']; ?> service-price=<?php  echo $row['price'];?> service-estc=<?php  echo $row['est_completion'];?> service-estc-unit=<?php  echo $row['unit'];?>> <?php  
                                             
                                             $service_name = $row['service_name'];
                                             $price = $row['price'];
@@ -84,15 +86,39 @@ function timeslots($duration, $cleanup, $start, $end){
                                 </div>
                                 <div class="form-group">
                                     <label for="">Staff</label>
-                                    <select name="staff" id="staff" class="form-control" required>
+                                    <select name="staff" id="staff" class="form-control"  onchange="generateTime(this)" required>
+                                    <option></option>
                                     <?php
                                      $fetch_query = "Select * from clientusers where type ='staff'";
+                                     $date = $_GET['date'];
+                                     $fetch_query_with_time ="
+                                     Select staff_id, SUM(est_completion) as total_completion from bookings JOIN clientusers on bookings.staff_id = clientusers.id
+                                     JOIN service_booking on bookings.id = service_booking.booking_id
+                                      JOIN services on service_booking.services_id = services.service_id where type='staff' and bookings.date = '$date' GROUP BY staff_id 
+                                       ";
+
+                                     $result = $mysqli->query($fetch_query_with_time) or die(mysqli_error($connect));
+
+
+                                     $availability_arr = array();
+
+                                     while($row = $result->fetch_assoc()){
+                                         $availability_arr[$row['staff_id']] = intval($row['total_completion']);
+                                     }
+                                   
                                      $records = $mysqli->query($fetch_query ) or die(mysqli_error($connect));
+                                     $MINUTES_OF_OPERATION = 690; //minutes - 11hrs and 30minutes
                                       while($row = $records->fetch_assoc()){ 
-                                          $availability  = ($row['isAvailable'] == 1) ? "Available" : "Busy" ;
-                                          $isdisabled  = ($row['isAvailable'] == 1) ? "" : "disabled" ;
+                                             $user_id = $row['id'];
+                                             $time_consumed_in_this_date = 0;
+                                             if(array_key_exists($user_id, $availability_arr)){
+                                                $time_consumed_in_this_date = $availability_arr[$user_id]; 
+                                               
+                                             }
+                                          $availability  = ($time_consumed_in_this_date < $MINUTES_OF_OPERATION) ? "Available" : "Fully Booked" ;
+                                          $isdisabled  = ($time_consumed_in_this_date < $MINUTES_OF_OPERATION) ? "" : "disabled" ;
                                          ?>
-                                            <option value=<?php  echo $row['id']; ?>   <?php  echo $isdisabled?>> 
+                                            <option value=<?php  echo $row['id']; ?>   <?php  echo $isdisabled?>  tcid=<?php  echo $time_consumed_in_this_date?> > 
                                             <?php 
                                             $name = $row['name'];
                                             echo  " $name - $availability";?>
@@ -107,6 +133,10 @@ function timeslots($duration, $cleanup, $start, $end){
                                 <div class="form-group">
                                     <label>Total</label>
                                     <input type="number" value="0" class="form-control" readonly id="total">
+                                </div>
+                                <div class="form-group">
+                                    <label>Estimated time of completion</label>
+                                    <input type="text" value="0 minutes" class="form-control" readonly id="estc">
                                 </div>
                                 <div class="form-group pull-right">
                 
@@ -145,6 +175,8 @@ function timeslots($duration, $cleanup, $start, $end){
     <script>
 
         const totalLabel = document.querySelector("#total")
+        const estcLabel = document.querySelector("#estc")
+        let estcTotal = 0;
         $(document).ready(function() {
               $('.select2-services').select2();
         });
@@ -161,8 +193,29 @@ function timeslots($duration, $cleanup, $start, $end){
                     // console.log(option.getAttribute("service-price"))
             })
             totalLabel.value = parseInt(totalLabel.value) + parseInt(el.getAttribute("service-price"))
-  
+
+            const estc = parseInt(el.getAttribute('service-estc'))
+            const unit =  el.getAttribute('service-estc-unit')
+            estcTotal  += parseInt(estc) 
+            estcLabel.value = toHoursAndMinutes(estcTotal)
+
+            
 });
+
+const generateTime = (e)=>{
+    const time = e.options[e.selectedIndex].getAttribute('tcid')
+    let c = new Date(2021, 11, 25, 8, 0)
+    c.setMinutes(c.getMinutes() + parseInt(time));
+    const AM_PM = c.getHours() >= 12 ? 'PM': 'AM'
+    let min = c.getMinutes()
+        if (min < 10) { // or min = min < 10 ? '0' + min : min;
+        min = '0' + min;
+        } else {
+        min = min + '';
+        }
+    const availableTime = `${c.getHours()}:${min}${AM_PM}`
+     document.querySelector(".time-input").value = availableTime
+}
 $('.select2-services').on('select2:unselect', function (e) {
             
             const serviceId = e.params.data.id;
@@ -175,8 +228,21 @@ $('.select2-services').on('select2:unselect', function (e) {
                     // console.log(option.getAttribute("service-price"))
             })
             totalLabel.value = parseInt(totalLabel.value) - parseInt(el.getAttribute("service-price"))
-  
+           
+            const estc = parseInt(el.getAttribute('service-estc'))
+            const unit =  el.getAttribute('service-estc-unit')
+            estcTotal  -= parseInt(estc) 
+            estcLabel.value = toHoursAndMinutes(estcTotal)
+            
 });
+
+            const toHoursAndMinutes = (totalMinutes)=> {
+                const minutes = totalMinutes % 60;
+                const hours = Math.floor(totalMinutes / 60);
+                minute_unit = minutes > 1 ? 'minutes' : 'minute'
+                hour_unit = hours > 1  ? 'hours': 'hour'
+                return `${hours} ${hour_unit} ${minutes} ${minute_unit}`;
+                }
 
 
 
