@@ -130,7 +130,7 @@ JOIN services on service_booking.services_id = services.service_id where date = 
                                             // database connection
                                             require_once "db_connection.php";
                                         // Today's expense------------------------------------------------------------------------------------------------
-                                            $sql_command_todayExp = "SELECT total , date FROM bookings Where date= '$current_date' ";
+                                            $sql_command_todayExp = "select SUM(price) as total  from service_booking JOIN services on service_booking.services_id = services.service_id JOIN bookings on service_booking.booking_id = bookings.id where bookings.date = '$current_date'";
                                             $result = mysqli_query($conn ,$sql_command_todayExp);
                                             $rows =  mysqli_num_rows($result);
 
@@ -141,7 +141,7 @@ JOIN services on service_booking.services_id = services.service_id where date = 
                                             }
 
                                         // Yesterday's Expense--------------------------------------------------------------------------------------------------------
-                                        $sql_command_yesterdayExp = "SELECT total , date FROM bookings Where date = '$yesterday_date' ";
+                                        $sql_command_yesterdayExp = "select SUM(price) as total  from service_booking JOIN services on service_booking.services_id = services.service_id JOIN bookings on service_booking.booking_id = bookings.id where bookings.date = '$yesterday_date'";
                                         $result_y = mysqli_query($conn ,$sql_command_yesterdayExp);
                                         $rows_y =  mysqli_num_rows($result_y);
 
@@ -151,7 +151,7 @@ JOIN services on service_booking.services_id = services.service_id where date = 
                                             }
                                         }
                                         // weekly expense------------------------------------------------------------------------------------------------------------
-                                        $sql_command_weeklyExp = "SELECT total , date FROM bookings Where date BETWEEN '$weekly_date' AND '$current_date' ORDER BY date ";
+                                        $sql_command_weeklyExp = "select SUM(price) as total  from service_booking JOIN services on service_booking.services_id = services.service_id JOIN bookings on service_booking.booking_id = bookings.id where bookings.date = '$current_date' AND bookings.date = '$weekly_date'";
                                         $result_w = mysqli_query($conn , $sql_command_weeklyExp) ;
                                         $rows_w =  mysqli_num_rows($result_w);
                                         if($rows_w > 0){
@@ -160,7 +160,7 @@ JOIN services on service_booking.services_id = services.service_id where date = 
                                             }
                                         }
                                         // monthly expense -----------------------------------------------------------------------------------------------------------
-                                        $sql_command_monthlyExp = "SELECT total , date FROM bookings Where date BETWEEN '$monthly_date' AND '$current_date' ORDER BY date ";
+                                        $sql_command_monthlyExp = "select SUM(price) as total  from service_booking JOIN services on service_booking.services_id = services.service_id JOIN bookings on service_booking.booking_id = bookings.id where bookings.date = '$current_date' AND bookings.date = '$monthly_date'";
                                         $result_m = mysqli_query($conn , $sql_command_monthlyExp) ;
                                         $rows_m =  mysqli_num_rows($result_m);
                                         if($rows_m > 0){
@@ -169,7 +169,7 @@ JOIN services on service_booking.services_id = services.service_id where date = 
                                             }
                                         }
                                         // yearly expense----------------------------------------------------------------------------------------------------------
-                                        $sql_command_yearlyExp = "SELECT total , date  FROM bookings Where date BETWEEN '$yearly_date' AND '$current_date' ";
+                                        $sql_command_yearlyExp = "select SUM(price) as total  from service_booking JOIN services on service_booking.services_id = services.service_id JOIN bookings on service_booking.booking_id = bookings.id where bookings.date = '$current_date' AND bookings.date = '$yearly_date' ";
                                         $result_year = mysqli_query($conn , $sql_command_yearlyExp) ;
                                         $rows_year =  mysqli_num_rows($result_year);
                                         if($rows_year > 0){
@@ -178,7 +178,7 @@ JOIN services on service_booking.services_id = services.service_id where date = 
                                             }
                                         }
                                         // total expense------------------------------------------------------------------------------------------------------
-                                        $sql_command_totalExp = "SELECT total , date FROM bookings ORDER BY date ";
+                                        $sql_command_totalExp = "select SUM(price) as total  from service_booking JOIN services on service_booking.services_id = services.service_id JOIN bookings on service_booking.booking_id = bookings.id";
                                         $result_t = mysqli_query($conn , $sql_command_totalExp) ;
                                         $rows_t =  mysqli_num_rows($result_t);
                                         if($rows_t > 0){

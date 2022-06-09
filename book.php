@@ -53,7 +53,7 @@ function timeslots($duration, $cleanup, $start, $end){
 
                                     <input type="text" readonly name="time" class="form-control time-input">
                                     <label for="time">Time</label>
-                                    <!-- <select name="time" class="form-control"> 
+                                    <select name="time" class="form-control"> 
                                     <?php $timeslots = timeslots($duration, $cleanup, $start, $end);
                                       foreach($timeslots as $ts){
                                     ?>
@@ -61,7 +61,7 @@ function timeslots($duration, $cleanup, $start, $end){
                                         <?php
                                       }    
                                     ?>
-                                    </select> -->
+                                    </select>
                                 </div>
                                 </div>
                                 <div class="form-group">
