@@ -1,7 +1,8 @@
 <?php
 
 session_start();
-
+$user_type = $_SESSION['type'];
+$user_id = $_SESSION['id'];
 if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
 
  ?>
@@ -196,7 +197,11 @@ JOIN services on service_booking.services_id = services.service_id where date = 
                                         <i class="fa-solid fa-user"></i>
                                         <?php
                                         require 'datatables/donependingcon.php';
-                                        $query = "SELECT * from bookings WHERE status ='pending' ";
+                                        $query = "SELECT * from bookings WHERE status ='pending'";
+                                        if($user_type == 'staff'){
+                                            $query = "SELECT * from bookings WHERE status ='pending' AND staff_id = $user_id";
+                                        }
+                                       
                                         $query_run = mysqli_query($connection, $query);
                                         $row = mysqli_num_rows($query_run);
                                         echo '<h3>'.$row.'<h3>';
@@ -214,7 +219,10 @@ JOIN services on service_booking.services_id = services.service_id where date = 
                                     <i class="fa-solid fa-user"></i>
                                     <?php
                                         require 'datatables/donependingcon.php';
-                                        $query = "SELECT * from bookings WHERE status ='done' ";
+                                        $query = "SELECT * from bookings WHERE status ='done'";
+                                        if($user_type == 'staff'){
+                                            $query = "SELECT * from bookings WHERE status ='done' AND staff_id =$user_id";
+                                        }
                                         $query_run = mysqli_query($connection, $query);
                                         $row = mysqli_num_rows($query_run);
                                         echo '<h3>'.$row.'<h3>';
@@ -231,6 +239,9 @@ JOIN services on service_booking.services_id = services.service_id where date = 
                                         <?php
                                             require 'datatables/donependingcon.php';
                                             $query = "SELECT * from bookings";
+                                            if($user_type == 'staff'){
+                                                $query = "SELECT * from bookings WHERE staff_id = $user_id";
+                                            }
                                             $query_run = mysqli_query($connection, $query);
                                             $row = mysqli_num_rows($query_run);
                                             echo '<h3>'.$row.'<h3>';
