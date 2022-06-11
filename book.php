@@ -49,11 +49,13 @@ function timeslots($duration, $cleanup, $start, $end){
                             <div class="w-25 mt-5 mx-auto">
                             <form action="" id="appointmentForm" method="post">
                                 <div class="form-group">
-                                <div class="form-group">
-
-                                    <input type="text" readonly name="time" class="form-control time-input">
-                                    <label for="time">Time</label>
-                                    <select name="time" class="form-control"> 
+                                <div class="form-group" id="timeSelection">
+                                 <label for="time">Time</label>
+                                    <div>
+                                    
+                                
+                                    <select name="time" class="form-control" onchange="checkIfAvailable(this)" required>
+                                    <option></option> 
                                     <?php $timeslots = timeslots($duration, $cleanup, $start, $end);
                                       foreach($timeslots as $ts){
                                     ?>
@@ -62,9 +64,17 @@ function timeslots($duration, $cleanup, $start, $end){
                                       }    
                                     ?>
                                     </select>
+                                    </div>
                                 </div>
                                 </div>
-                                <div class="form-group">
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="systemGeneratedTimeChecked" onchange="onChangeTimeSelection(this)">
+                                    <label class="form-check-label" for="systemGeneratedTimeChecked">
+                                        Use System Generated Time
+                                    </label>
+                                    </div>
+                                    <div class="form-group">
                                     
                                 <label for="">Services</label>
                                 <select name="hairtreatment" id="hairtreatment" class="form-control select2-services" required multiple>
@@ -145,6 +155,23 @@ function timeslots($duration, $cleanup, $start, $end){
                             </form>
                             </div>
 
+
+                            <template id="selectTimeInputTemplate">
+                            <select name="time" class="form-control" onchange="checkIfAvailable(this)" required> 
+                                    <option></option>
+                                    <?php $timeslots = timeslots($duration, $cleanup, $start, $end);
+                                      foreach($timeslots as $ts){
+                                    ?>
+                                        <option value="<?php echo $ts; ?>"><?php echo $ts;?> </option>
+                                        <?php
+                                      }    
+                                    ?>
+                                    </select>
+                            </template>
+
+                            <template id="generateTimeInputTemplate">
+                                <input type="text" readonly name="time" class="form-control time-input">
+                            </template>
                      
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
@@ -201,20 +228,65 @@ function timeslots($duration, $cleanup, $start, $end){
 
             
 });
+const onChangeTimeSelection = (e)=>{
 
+    const isSelected = e.checked
+    const formGroup = document.querySelector('#timeSelection').querySelector('div')
+    formGroup.innerHTML = '';
+    const selecTimeInputTemplate = document.querySelector('#selectTimeInputTemplate')
+    const selectTimeInput = selectTimeInputTemplate.content.cloneNode(true)
+
+    const generateTimeInputTemplate = document.querySelector('#generateTimeInputTemplate')
+    const generateTimeInput = generateTimeInputTemplate.content.cloneNode(true)
+    if(isSelected){
+        formGroup.append(generateTimeInput)
+ 
+    }
+    else{
+        formGroup.append(selectTimeInput)
+    }
+}
+const checkIfAvailable = async(el)=>{
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const date = urlParams.get('date')
+    const request = await fetch(`book_route.php?date=${date}&time=${el.value}`)
+    const response = await request.json()
+
+    if(response.has_booking){
+        Swal.fire({
+                title: 'Are you sure?',
+                text: "This timeslot has been booked. Your booking time might be subjected to be reschedule.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, continue'
+                }).then((result) => {
+                    if(!result.isConfirmed){
+                        document.querySelector('#systemGeneratedTimeChecked').click();
+                    }
+                })
+    }
+   
+}
 const generateTime = (e)=>{
-    const time = e.options[e.selectedIndex].getAttribute('tcid')
-    let c = new Date(2021, 11, 25, 8, 0)
-    c.setMinutes(c.getMinutes() + parseInt(time));
-    const AM_PM = c.getHours() >= 12 ? 'PM': 'AM'
-    let min = c.getMinutes()
-        if (min < 10) { // or min = min < 10 ? '0' + min : min;
-        min = '0' + min;
-        } else {
-        min = min + '';
-        }
-    const availableTime = `${c.getHours()}:${min}${AM_PM}`
-     document.querySelector(".time-input").value = availableTime
+    const isSelected = document.querySelector('#systemGeneratedTimeChecked').checked
+    if(isSelected){
+            const time = e.options[e.selectedIndex].getAttribute('tcid')
+        let c = new Date(2021, 11, 25, 8, 0)
+        c.setMinutes(c.getMinutes() + parseInt(time));
+        const AM_PM = c.getHours() >= 12 ? 'PM': 'AM'
+        let min = c.getMinutes()
+            if (min < 10) { // or min = min < 10 ? '0' + min : min;
+            min = '0' + min;
+            } else {
+            min = min + '';
+            }
+        const availableTime = `${c.getHours()}:${min}${AM_PM}`
+        document.querySelector(".time-input").value = availableTime
+    }
+   
 }
 $('.select2-services').on('select2:unselect', function (e) {
             

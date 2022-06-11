@@ -26,4 +26,22 @@ if($_SERVER["REQUEST_METHOD"] === "POST"){
     echo json_encode(array("message" =>"Success"));
 }
 
+if($_SERVER['REQUEST_METHOD'] === "GET"){
+    if(isset($_GET['date']) && isset($_GET['time'])){
+        $date = $_GET['date'];
+        $time = $_GET['time'];
+        $query = "SELECT * from bookings where date ='$date' AND timeslot='$time'";
+        $result  = mysqli_query($conn, $query);
+        if(mysqli_num_rows($result) >= 1){
+            echo json_encode(array("has_booking" =>true));
+        }
+        else{
+            echo json_encode(array("has_booking" =>false));
+
+        }
+    }
+}
+
+
+
 ?>

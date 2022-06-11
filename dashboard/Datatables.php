@@ -1,3 +1,35 @@
+
+<?php
+$duration = 10;
+$cleanup = 0;
+$start = "09:00";
+$end = "15:00";
+
+function timeslots($duration, $cleanup, $start, $end){
+    $start = new DateTime($start);
+    $end = new DateTime($end);
+    $interval = new DateInterval("PT".$duration."M");
+    $cleanupInterval = new DateInterval("PT".$cleanup."M");
+    $slots = array();
+
+    for($intStart = $start; $intStart<$end; $intStart->add($interval)->add($cleanupInterval)){
+        $endPeriod = clone $intStart;
+        $endPeriod->add($interval);
+        if($endPeriod>$end){
+            break;
+        }
+
+        $slots[] = $intStart->format("H:iA")." - ". $endPeriod->format("H:iA");
+
+    }
+
+    return $slots;
+}
+
+
+
+?>
+
 <?php include('include/header.php');?>
 
         <div id="layoutSidenav">
@@ -77,13 +109,14 @@
                                 <div class="actions">
                                          <button class="btn btn-success done" action="done" onclick="markAppointment(this)"><i class="fa fa-check"></i></button>
                                          <button class="btn btn-danger cancel" action="cancel" onclick="markAppointment(this)"><i class="fa fa-times"></i></button>
+                                         <button class="btn btn-primary edit" data-toggle="modal"data-target="#editAppointmentModal" onclick="setValues(this)">  <i class="fa fa-pencil" aria-hidden="true"></i></button>
                                 </div>
                                <!-- <button class="btn btn-primary view-services"  data-toggle="modal" onclick="fetchServices(this)" data-target="#servicesListModal">View services</button> -->
                             </td>
                         </tr> 
                      </template>
                      <template id="serviceRowTemplate">
-                     <tr>
+                        <tr>
                             <td class="service-name">
 
                             </td>
@@ -93,10 +126,90 @@
                             
                         </tr> 
                      </template>
+
+
+                     <div class="modal" id="servicesListModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Services Availed</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Service
+                    </th>
+                    <th>
+                        Price
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="servicesTbody">
+
+            </tbody>
+        </table>
+        <h3 class="service-total"></h3>
+      </div> 
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" id="editAppointmentModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit appointment</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+                     <form id="editAppointmentForm">
+                         <div class="form-group">
+                         <select name="time" class="form-control editTimeSelect" required>
+                                    <option></option> 
+                                    <?php $timeslots = timeslots($duration, $cleanup, $start, $end);
+                                      foreach($timeslots as $ts){
+                                    ?>
+                                        <option value="<?php echo $ts; ?>"><?php echo $ts;?> </option>
+                                        <?php
+                                      }    
+                                    ?>
+                                    </select>
+                         </div>
+                         <button class="btn btn-primary" type="submit">Update</button>
+                     </form>
+
+      </div> 
+      <div class="modal-footer">
+        <!-- <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+      </div>
+    </div>
+  </div>
+</div>
                  <script>
                      const fetchAppointments = async()=>{
-                        const request = await fetch("datatables/fetch.php",{method:"GET"})
-                        const response = await request.json();
+                        const queryString = window.location.search;
+                        const urlParams = new URLSearchParams(queryString);
+                        let filter = urlParams.get('filter')
+                        if(filter == null){
+                            filter = "total"  
+                        }
+                   
+                            const request = await fetch(`datatables/fetch.php?filter=${filter}`,{method:"GET"})
+                             const response = await request.json();
+                     
                         populateTable(response.records)
 
                      }
@@ -115,6 +228,7 @@
                             }
                             tableRow.querySelector('.view-services').setAttribute('apnt-id', d.id)
                             tableRow.querySelector('.actions').setAttribute('apnt-id', d.id)
+                            tableRow.querySelector('.actions').setAttribute('time', d.timeslot)
                             if(d.status === "done"){
                                         tableRow.querySelector('.actions').querySelector('.done').remove()
                             }
@@ -180,47 +294,41 @@
                                 fetchAppointments();
                             }
                             })
+                            
                      }
                      fetchAppointments()
+                     
+                     
+                     const setValues = (e)=>{
+                         
+                            const select = document.querySelector(".editTimeSelect")
+                          
+                            select.parentElement.parentElement.setAttribute('apnt-id', e.parentElement.getAttribute('apnt-id'))
+                            select.value = e.parentElement.getAttribute('time')
+                     }
+                     const submitUpdates = async(e)=>{
+                            e.preventDefault();
+                            const id = e.target.getAttribute('apnt-id')
+                            const form = new FormData(e.target)
+                            const time = form.get('time')
+                            const request = await fetch(`datatables/fetch.php?time=${time}&id=${id}`, {method:"PUT"})
+                            const response = await request.text()
+                            Swal.fire({
+                                    position: 'center',
+                                    icon: 'success',
+                                    title: 'Appointment updated',
+                                    showConfirmButton: false,
+                                     timer: 1500
+                                })
+                            fetchAppointments();
+                     }
+                     document.querySelector('#editAppointmentForm').addEventListener('submit',submitUpdates)
                  </script>
                 <?php include('include/footer.php');?>
             </div>
         </div>
 
-    <div class="modal" id="servicesListModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Services Availed</h3>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>
-                        Service
-                    </th>
-                    <th>
-                        Price
-                    </th>
-                </tr>
-            </thead>
-            <tbody id="servicesTbody">
 
-            </tbody>
-        </table>
-        <h3 class="service-total"></h3>
-      </div> 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>       
 <?php include('include/scripts.php');?>

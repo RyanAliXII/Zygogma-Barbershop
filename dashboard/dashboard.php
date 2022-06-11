@@ -191,7 +191,7 @@ JOIN services on service_booking.services_id = services.service_id where date = 
                              <!-- Stat Box Pending-->
                             <div class="col-lg-3 col-6">
                                 <!-- small box -->
-                                <div class="small-box ">
+                                <a class="small-box " href="datatables.php?filter=pending" style="text-decoration:none; color:black;">
                                       <div class="inner">
                                         <i class="fa-solid fa-user"></i>
                                         <?php
@@ -204,12 +204,12 @@ JOIN services on service_booking.services_id = services.service_id where date = 
                                         <p>PENDING</p>
                                       </div>
 
-                                </div>
+                                </a>
                             </div>
                               <!-- Stat Box Done-->
                             <div class="col-lg-3 col-6">
                                 <!-- small box -->
-                                <div class="small-box ">
+                                <a class="small-box " href="datatables.php?filter=done" style="text-decoration:none; color:black;">
                                   <div class="inner">
                                     <i class="fa-solid fa-user"></i>
                                     <?php
@@ -221,11 +221,11 @@ JOIN services on service_booking.services_id = services.service_id where date = 
                                         ?>
                                     <p>DONE</p>
                                   </div>
-                                </div>
+                                </a>
                             </div>
                             <div class="col-lg-3 col-6">
                                 <!-- small box -->
-                                <div class="small-box ">
+                                <a class="small-box " href="datatables.php?filter=total" style="text-decoration:none; color:black;">
                                     <div class="inner">
                                         <i class="fa-solid fa-user"></i>
                                         <?php
@@ -237,7 +237,7 @@ JOIN services on service_booking.services_id = services.service_id where date = 
                                             ?>
                                         <p>TOTAL APPOINMENTS</p>
                                     </div>
-                                </div>
+                                </a>
                             </div>
                             <div class="col-lg-3 col-6">
                                 <!-- small box -->
