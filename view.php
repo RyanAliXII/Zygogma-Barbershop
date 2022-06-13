@@ -74,8 +74,13 @@
                                         <td><?php echo $timeslot ?></td>
                                         <td><?php echo $status ?></td>
                                         <td> 
-                                            <div class="actions">
+                                            <div class="actions" apnt-id=<?php echo $row['id']?>>
+                                            <?php
+                                                if($row['status'] == 'pending'){
+                                            ?>
                                              <button class="btn btn-danger cancel" action="cancel" onclick="markAppointment(this)"><i class="fa fa-times"></i></button>
+                                             <?php
+                                             }?>
                                             </div>
                                         </td></td>
                                         
@@ -94,6 +99,31 @@
         </div>
 
 </body>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+           const markAppointment = (e)=>{
+                        const id = e.parentElement.getAttribute('apnt-id')
+                        const action = e.getAttribute('action')
+                        const text = action == 'done' ?  "Are you sure you want to accept this appointment?" : "Are you sure you want to cancel this appointment?"
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: text,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes'
+                            }).then(async(result) => {
+                            if (result.isConfirmed) {
+                                const request = await fetch(`dashboard/datatables/fetch.php?action=${action}&id=${id}`,{
+                                    method:"PUT"
+                                })
+                                location.reload()
+                            }
+                            })
+                            
+                     }
+</script>       
 </html>
 <style>
     .container{
