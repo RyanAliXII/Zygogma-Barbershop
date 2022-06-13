@@ -15,14 +15,14 @@ if($_SERVER['REQUEST_METHOD'] == "GET"){
 
        
         if($filter == 'total'){
-            $query = "SELECT bookings.id,staff.name as staff_name,date,timeslot,status, client.email as client_email,client.name as client_name,
+            $query = "SELECT bookings.id,staff.name as staff_name,date,timeslot,status, client.email as client_email,client.name as client_name,bookings.userid as client_id,
             (select SUM(price)  from service_booking JOIN services on service_booking.services_id = services.service_id where service_booking.booking_id = bookings.id ) as total  
             FROM db.bookings 
             INNER JOIN clientusers as client on bookings.userid = client.id
             INNER JOIN clientusers as staff on bookings.staff_id = staff.id";
         }
         else{
-            $query = "SELECT bookings.id,staff.name as staff_name,date,timeslot,status, client.email as client_email,client.name as client_name,
+            $query = "SELECT bookings.id,staff.name as staff_name,date,timeslot,status, client.email as client_email,client.name as client_name, bookings.userid as client_id,
             (select SUM(price)  from service_booking JOIN services on service_booking.services_id = services.service_id where service_booking.booking_id = bookings.id ) as total  
             FROM db.bookings 
             INNER JOIN clientusers as client on bookings.userid = client.id
@@ -33,14 +33,14 @@ if($_SERVER['REQUEST_METHOD'] == "GET"){
     else{
         $user_id = $_SESSION['id'];
         if($filter == 'total'){
-        $query = "SELECT bookings.id,staff.name as staff_name,date,timeslot,status, client.email as client_email,client.name as client_name,
+        $query = "SELECT bookings.id,staff.name as staff_name,date,timeslot,status, client.email as client_email,client.name as client_name,bookings.userid as client_id,
         (select SUM(price)  from service_booking JOIN services on service_booking.services_id = services.service_id where service_booking.booking_id = bookings.id ) as total  
         FROM db.bookings 
         INNER JOIN clientusers as client on bookings.userid = client.id
         INNER JOIN clientusers as staff on bookings.staff_id = staff.id 
         WHERE staff_id = $user_id";
         }else{
-            $query = "SELECT bookings.id,staff.name as staff_name,date,timeslot,status, client.email as client_email,client.name as client_name,
+            $query = "SELECT bookings.id,staff.name as staff_name,date,timeslot,status, client.email as client_email,client.name as client_name,bookings.userid as client_id,
             (select SUM(price)  from service_booking JOIN services on service_booking.services_id = services.service_id where service_booking.booking_id = bookings.id ) as total  
             FROM db.bookings 
             INNER JOIN clientusers as client on bookings.userid = client.id
@@ -59,6 +59,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET"){
             $appointment = array(
                 "id"=> $id,
                 "name"=> $client_name,
+                "client_id"=>$client_id,
                 "email"=> $client_email,
                 "staff"=>$staff_name,
                 "price"=>$total,
@@ -83,6 +84,7 @@ if($_SERVER['REQUEST_METHOD'] == "PUT"){
     $action = $_GET['action'];
     $query= "UPDATE bookings SET status = '$action' where id = $id";
     $result = mysqli_query($connect, $query);
+ 
     echo json_encode(array("message"=>"Booking status updated"));
     }
     if(isset($_GET['id']) && isset($_GET['time'])){
@@ -90,7 +92,12 @@ if($_SERVER['REQUEST_METHOD'] == "PUT"){
          $id = $_GET['id'];
          $time = $_GET['time'];
          $query= "UPDATE bookings SET timeslot = '$time' where id = $id";
-         $result = mysqli_query($connect, $query);
+         $client_id  = $_GET['client_id'];
+         $reason =  $_GET['reason'];
+         $reason = "Your appoinment with appointment id $id has been moved to $time. Reason: $reason";
+         $insert_notif_query = "INSERT INTO notifications (user_id,text) VALUES ($client_id,'$reason')";
+         mysqli_query($connect, $insert_notif_query);
+         mysqli_query($connect, $insert_notif_query);
          echo json_encode(array("message"=>"Booking time updated"));
     } 
     

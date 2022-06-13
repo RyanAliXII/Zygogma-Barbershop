@@ -187,6 +187,10 @@ function timeslots($duration, $cleanup, $start, $end){
                                     ?>
                                     </select>
                          </div>
+                         <div class="form-group">
+                                      <label for="reason"></label>
+                                  <textarea rows="1" cols="50" wrap="physical"  class="form-control" name="reason"></textarea>
+                         </div>
                          <button class="btn btn-primary" type="submit">Update</button>
                      </form>
 
@@ -229,6 +233,7 @@ function timeslots($duration, $cleanup, $start, $end){
                             tableRow.querySelector('.view-services').setAttribute('apnt-id', d.id)
                             tableRow.querySelector('.actions').setAttribute('apnt-id', d.id)
                             tableRow.querySelector('.actions').setAttribute('time', d.timeslot)
+                            tableRow.querySelector('.actions').setAttribute('client', d.client_id)
                             if(d.status === "done"){
                                         tableRow.querySelector('.actions').querySelector('.done').remove()
                             }
@@ -304,14 +309,17 @@ function timeslots($duration, $cleanup, $start, $end){
                             const select = document.querySelector(".editTimeSelect")
                           
                             select.parentElement.parentElement.setAttribute('apnt-id', e.parentElement.getAttribute('apnt-id'))
+                            select.parentElement.parentElement.setAttribute('client', e.parentElement.getAttribute('client'))
                             select.value = e.parentElement.getAttribute('time')
                      }
                      const submitUpdates = async(e)=>{
                             e.preventDefault();
                             const id = e.target.getAttribute('apnt-id')
+                            const clientId = e.target.getAttribute('client')
                             const form = new FormData(e.target)
                             const time = form.get('time')
-                            const request = await fetch(`datatables/fetch.php?time=${time}&id=${id}`, {method:"PUT"})
+                            const reason = form.get('reason')
+                            const request = await fetch(`datatables/fetch.php?time=${time}&id=${id}&client_id=${clientId}&reason=${reason}`, {method:"PUT"})
                             const response = await request.text()
                             Swal.fire({
                                     position: 'center',

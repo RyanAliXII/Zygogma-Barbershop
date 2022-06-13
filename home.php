@@ -1,6 +1,7 @@
 <?php
 
    include "session_checker.php";
+   include "db_conn.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,7 +19,7 @@
 
    <!-- custom css file link  -->
    <link rel="stylesheet" href="css/style.css">
-
+   <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
@@ -76,6 +77,31 @@
                </ul>
             </div>
          </div>
+         <div class="dropdown">
+  <button class="btn link-btn rounded-circle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  <i class="fas fa-bell" style="font-size: 2rem"></i>
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+     <?php
+         $id = $_SESSION['id'];
+         $query = "SELECT * FROM notifications where user_id = $id";
+          $result = mysqli_query($conn, $query);
+         if (mysqli_num_rows($result) < 0){     
+     ?>
+        <a class="dropdown-item" style="font-size: 1.5rem" href="#">No Notifications</a>
+      <?php
+         }
+         else{
+            while($row = mysqli_fetch_assoc($result)){
+      ?>
+            <a class="dropdown-item" style="font-size: 1.5rem" href="#"><?php echo $row['text'] ?></a> 
+
+<?php } } ?>
+    <!-- <a class="dropdown-item" href="#">Action</a>
+    <a class="dropdown-item" href="#">Another action</a>
+    <a class="dropdown-item" href="#">Something else here</a> -->
+  </div>
+</div>
       <script>
          const drop_btn = document.querySelector(".drop-btn span");
          const tooltip = document.querySelector(".tooltip");
