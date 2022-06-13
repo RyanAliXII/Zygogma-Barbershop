@@ -1,4 +1,5 @@
 <?php
+include "session_checker.php";
 function build_calendar($month, $year) {
     $mysqli = new mysqli('localhost', 'root', 'password', 'db');
     $stmt = $mysqli->prepare("select * from bookings where MONTH(date) = ? AND YEAR(date) = ?");

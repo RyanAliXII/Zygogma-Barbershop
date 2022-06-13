@@ -1,3 +1,7 @@
+<?php
+include "admin_session_checker.php";
+?>
+
 <?php include('include/reviewheader.php');?>
         <div id="layoutSidenav">
             <?php include('include/navbar.php');?>

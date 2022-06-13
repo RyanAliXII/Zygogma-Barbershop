@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <?php
 include "db_conn.php";
+include "admin_session_checker.php";
 session_start();
+
  $connect = $conn;
  $query = "SELECT status, count(*) as number FROM bookings GROUP BY status";
  $result = mysqli_query($connect, $query);
@@ -96,7 +98,7 @@ session_start();
 
 
     </head>
-    <body class="sb-nav-fixed">
+  <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <!-- Navbar Brand-->
             <img src="image/logo.png" >

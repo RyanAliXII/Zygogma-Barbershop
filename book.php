@@ -1,4 +1,5 @@
-<?php
+<?php   
+include "session_checker.php";
 session_start(); 
 $mysqli = new mysqli('localhost', 'root', 'password', 'db');
 

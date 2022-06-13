@@ -1,5 +1,5 @@
 <?php
-
+include "admin_session_checker.php";
 session_start();
 $user_type = $_SESSION['type'];
 $user_id = $_SESSION['id'];
